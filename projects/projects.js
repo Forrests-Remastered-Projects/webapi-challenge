@@ -29,3 +29,27 @@ router.get("/:id", (req, res) => {
       res.status(500).json({ message: "Error getting project information" })
     );
 });
+
+router.post("/", (req, res) => {
+  const project = req.body;
+  const { name, description } = req.params;
+  if (!project.name || !project.description) {
+    return res.status(400).json({
+      error: "Please provide a name and description for your project"
+    });
+  }
+  if (project.name && project.description) {
+    res.status(200).json(project);
+  }
+  projectModel.insert({ name, description }).then(({ id }) => {
+    projectModel
+      .findById(id, res)
+      .then(([project]) => {
+        res.status(201).json(project);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({ error: "Error creating project" });
+      });
+  });
+});

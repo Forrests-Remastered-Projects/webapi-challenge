@@ -25,3 +25,10 @@ router.get("/:id", (req, res) => {
       res.status(500).json({ message: "Error getting Action information" })
     );
 });
+
+router.post("/", (req, res) => {
+  const action = req.body;
+  if (action.name && action.project_id && action.description && action.notes) {
+    res.status(200).json(action);
+  }
+});
