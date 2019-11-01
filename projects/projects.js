@@ -31,54 +31,30 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-  const project = req.body;
-  const { name, description } = req.params;
-  if (!project.name || !project.description) {
-    return res.status(400).json({
-      error: "Please provide a name and description for your project"
+  const { name, description } = req.body;
+
+  projectModel
+    .insert({ name, description })
+    .then(response => {
+      res.status(200).json({ message: "Project inserted!" });
+    })
+    .catch(error => {
+      res.status(500).json({ message: "Server Error" });
     });
-  }
-  if (project.name && project.description) {
-    res.status(200).json(project);
-  }
-  projectModel.insert({ name, description }).then(({ id }) => {
-    projectModel
-      .findById(id, res)
-      .then(([project]) => {
-        res.status(201).json(project);
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500).json({ error: "Error creating project" });
-      });
-  });
 });
 
 router.put("/:id", (req, res) => {
   const { id } = req.params;
   const { name, description } = req.body;
-  if (!name && !description) {
-    return res
-      .status(400)
-      .json({ error: "Error, must include name and description" });
-  }
+
   projectModel
     .update(id, { name, description })
-    .then(updated => {
-      if (updated === 1) {
-        projectModel.findById(id).then(project => {
-          res.status(200).json(project);
-        });
-        console.log(updated);
-      } else {
-        res.status(404).json({ error: "Project with id does not exist" });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: "Error updating project" });
-    });
+    .then(response =>
+      res.status(200).json({ message: "updated", data: response })
+    )
+    .catch(error => res.status(500).json({ message: "Server Error" }));
 });
+
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
 
