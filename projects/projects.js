@@ -53,3 +53,47 @@ router.post("/", (req, res) => {
       });
   });
 });
+
+router.put("/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, description } = req.body;
+  if (!name && !description) {
+    return res
+      .status(400)
+      .json({ error: "Error, must include name and description" });
+  }
+  projectModel
+    .update(id, { name, description })
+    .then(updated => {
+      if (updated === 1) {
+        projectModel.findById(id).then(project => {
+          res.status(200).json(project);
+        });
+        console.log(updated);
+      } else {
+        res.status(404).json({ error: "Project with id does not exist" });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: "Error updating project" });
+    });
+});
+router.delete("/:id", (req, res) => {
+  const { id } = req.params;
+
+  projectModel
+    .remove(id)
+    .then(removed => {
+      if (removed) {
+        res.status(204).end();
+      } else {
+        res.status(404).json({ error: "Project with id does not exist" });
+      }
+    })
+    .catch(err => {
+      console.log("delete", err);
+      res.status(500).json({ error: "Error deleting project" });
+    });
+});
+module.exports = router;
