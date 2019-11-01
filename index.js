@@ -12,3 +12,11 @@ I need this code, just don't know where, perhaps should make some middleware, do
 
 Go code!
 */
+const express = require("express");
+const projectRoute = require("./projects/projects");
+const actionRoute = require("./actions/actions");
+const server = express();
+server.use(express.json());
+server.use("/api/projects", projectRoute);
+server.use("/api/actions", actionRoute);
+server.listen(7000, () => console.log("Server is running :)!! :D"));
